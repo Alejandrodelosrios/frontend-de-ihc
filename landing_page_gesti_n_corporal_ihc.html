@@ -116,16 +116,7 @@
             
             <!-- Botón Principal de Descarga Centrado -->
             <div class="mt-4 flex flex-col items-center gap-3">
-                     <!--
-                          PARA PUBLICAR EL APK DE FLUTTER:
-                          1. Genera el archivo con: flutter build apk --release
-                          2. Sube build/app/outputs/flutter-apk/app-release.apk a GitHub Releases
-                              (o a otro servicio de archivos que entregue una URL pública directa).
-                          3. Reemplaza el valor de href por esa URL, por ejemplo:
-                              href="https://github.com/USUARIO/REPOSITORIO/releases/download/v1.0.0/app-release.apk"
-                          No uses la URL de la página de GitHub; debe apuntar directamente al archivo .apk.
-                     -->
-                <a href="#" id="apkDownloadLink" onclick="handleApkDownload(event)" class="group inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-forest-700 hover:bg-forest-800 text-cream-50 font-extrabold text-lg shadow-lg shadow-forest-700/25 hover:scale-105 active:scale-95 transition-all border border-forest-600">
+                <a href="app-release.apk" download="app-release.apk" id="apkDownloadLink" onclick="handleApkDownload(event)" class="group inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-forest-700 hover:bg-forest-800 text-cream-50 font-extrabold text-lg shadow-lg shadow-forest-700/25 hover:scale-105 active:scale-95 transition-all border border-forest-600">
                     <span class="flex items-center gap-3">
                         <i class="fa-solid fa-circle-down text-xl text-sage-200 group-hover:animate-bounce"></i>
                         <span>Descargar APK Directo</span>
@@ -172,15 +163,8 @@
         let downloadTimer = null;
 
         function handleApkDownload(event) {
-            const link = document.getElementById("apkDownloadLink");
-            const href = link ? link.getAttribute("href") : "#";
-
-            if (!href || href === "#") {
-                event.preventDefault();
-                simulateApkDownload();
-            } else {
-                showToast("Iniciando descarga...", "success");
-            }
+            event.preventDefault(); // Previene la descarga inmediata para mostrar la animación primero
+            simulateApkDownload();
         }
 
         function simulateApkDownload() {
@@ -194,6 +178,8 @@
             progressBar.style.width = "0%";
 
             let progress = 0;
+            if (downloadTimer) clearInterval(downloadTimer);
+
             downloadTimer = setInterval(() => {
                 progress += Math.floor(Math.random() * 20) + 15;
                 if (progress > 100) progress = 100;
@@ -205,9 +191,10 @@
                 if (progress >= 100) {
                     clearInterval(downloadTimer);
                     setTimeout(() => {
-                        triggerSyntheticFileDownload();
-                        showToast("Descarga completada", "success");
-                    }, 300);
+                        closeDownloadModal();
+                        triggerRealFileDownload();
+                        showToast("Descarga completada");
+                    }, 400);
                 }
             }, 200);
         }
@@ -217,16 +204,18 @@
             document.getElementById("downloadModal")?.classList.add("hidden");
         }
 
-        function triggerSyntheticFileDownload() {
-            const blob = new Blob(["Gestión Corporal - App Mobile APK Release"], { type: 'application/vnd.android.package-archive' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = "app-release.apk";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+        function triggerRealFileDownload() {
+            const link = document.createElement('a');
+            
+            // Si estás abriendo el archivo localmente (file://), busca en 'public/app-release.apk'
+            // Si está subido en la web/Vercel, busca directamente 'app-release.apk'
+            const isLocalFile = window.location.protocol === 'file:';
+            link.href = isLocalFile ? "public/app-release.apk" : "app-release.apk";
+            link.download = "app-release.apk";
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function showToast(message) {
@@ -238,7 +227,6 @@
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
         }
-
     </script>
 </body>
 </html>
