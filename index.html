@@ -116,7 +116,7 @@
             
             <!-- Botón Principal de Descarga Centrado -->
             <div class="mt-4 flex flex-col items-center gap-3">
-                <a href="app-release.apk" download="app-release.apk" id="apkDownloadLink" onclick="handleApkDownload(event)" class="group inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-forest-700 hover:bg-forest-800 text-cream-50 font-extrabold text-lg shadow-lg shadow-forest-700/25 hover:scale-105 active:scale-95 transition-all border border-forest-600">
+                <a href="public/app-release.apk" download="app-release.apk" id="apkDownloadLink" onclick="handleApkDownload(event)" class="group inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-forest-700 hover:bg-forest-800 text-cream-50 font-extrabold text-lg shadow-lg shadow-forest-700/25 hover:scale-105 active:scale-95 transition-all border border-forest-600">
                     <span class="flex items-center gap-3">
                         <i class="fa-solid fa-circle-down text-xl text-sage-200 group-hover:animate-bounce"></i>
                         <span>Descargar APK Directo</span>
@@ -207,10 +207,8 @@
         function triggerRealFileDownload() {
             const link = document.createElement('a');
             
-            // Si estás abriendo el archivo localmente (file://), busca en 'public/app-release.apk'
-            // Si está subido en la web/Vercel, busca directamente 'app-release.apk'
-            const isLocalFile = window.location.protocol === 'file:';
-            link.href = isLocalFile ? "public/app-release.apk" : "app-release.apk";
+            // Apunta directamente a la carpeta public donde se encuentra el archivo APK en GitHub
+            link.href = "public/app-release.apk";
             link.download = "app-release.apk";
 
             document.body.appendChild(link);
